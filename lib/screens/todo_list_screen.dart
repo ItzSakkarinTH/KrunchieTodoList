@@ -153,18 +153,16 @@ class _TodoListScreenState extends State<TodoListScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    decoration: item.isCompleted 
-                        ? TextDecoration.lineThrough 
+                    decoration: item.isCompleted
+                        ? TextDecoration.lineThrough
                         : TextDecoration.none,
-                    color: item.isCompleted 
-                        ? Colors.grey 
-                        : Colors.black,
+                    color: item.isCompleted ? Colors.grey : Colors.black,
                   ),
                 ),
               ),
             ],
           ),
-          
+
           // Date and Time info
           if (item.startDate != null || item.endDate != null) ...[
             SizedBox(height: 8),
@@ -216,7 +214,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                 child: Text(
                   item.title,
                   style: TextStyle(
-                    color: Colors.white, 
+                    color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -224,7 +222,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
               ),
             ],
           ),
-          
+
           // Completed date info
           if (item.startDate != null) ...[
             SizedBox(height: 8),
@@ -239,7 +237,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
               ],
             ),
           ],
-          
+
           if (item.completedDate != null) ...[
             SizedBox(height: 4),
             Row(
@@ -284,12 +282,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
             icon: Icon(Icons.list_alt, color: Colors.white, size: 28),
           ),
           IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AppScreen()),
-              );
-            },
+            onPressed: () {},
             icon: Icon(Icons.calendar_today, color: Colors.white, size: 28),
           ),
           IconButton(
@@ -328,9 +321,9 @@ class _TodoListScreenState extends State<TodoListScreen> {
                         border: OutlineInputBorder(),
                       ),
                     ),
-                    
+
                     SizedBox(height: 16),
-                    
+
                     // Start Date
                     _buildDateTimePicker(
                       label: 'วันที่เริ่มต้น',
@@ -339,9 +332,9 @@ class _TodoListScreenState extends State<TodoListScreen> {
                       onDateTap: () => _selectStartDate(setDialogState),
                       onTimeTap: () => _selectStartTime(setDialogState),
                     ),
-                    
+
                     SizedBox(height: 12),
-                    
+
                     // End Date
                     _buildDateTimePicker(
                       label: 'วันที่สิ้นสุด',
@@ -365,14 +358,16 @@ class _TodoListScreenState extends State<TodoListScreen> {
                   onPressed: () {
                     if (_todoController.text.isNotEmpty) {
                       setState(() {
-                        todoItems.add(TodoItem(
-                          title: _todoController.text,
-                          isCompleted: false,
-                          startDate: _selectedStartDate,
-                          endDate: _selectedEndDate,
-                          startTime: _selectedStartTime,
-                          endTime: _selectedEndTime,
-                        ));
+                        todoItems.add(
+                          TodoItem(
+                            title: _todoController.text,
+                            isCompleted: false,
+                            startDate: _selectedStartDate,
+                            endDate: _selectedEndDate,
+                            startTime: _selectedStartTime,
+                            endTime: _selectedEndTime,
+                          ),
+                        );
                       });
                       _todoController.clear();
                       Navigator.pop(context);
@@ -419,8 +414,8 @@ class _TodoListScreenState extends State<TodoListScreen> {
                       Icon(Icons.calendar_today, size: 16),
                       SizedBox(width: 8),
                       Text(
-                        date != null 
-                            ? '${date.day}/${date.month}/${date.year}' 
+                        date != null
+                            ? '${date.day}/${date.month}/${date.year}'
                             : 'เลือกวันที่',
                         style: TextStyle(
                           color: date != null ? Colors.black : Colors.grey,
@@ -446,8 +441,8 @@ class _TodoListScreenState extends State<TodoListScreen> {
                       Icon(Icons.access_time, size: 16),
                       SizedBox(width: 8),
                       Text(
-                        time != null 
-                            ? '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}' 
+                        time != null
+                            ? '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}'
                             : 'เลือกเวลา',
                         style: TextStyle(
                           color: time != null ? Colors.black : Colors.grey,
