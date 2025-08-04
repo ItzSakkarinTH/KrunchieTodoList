@@ -21,60 +21,56 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Spacer(),
-              
+
               // Logo section
               Container(
-                width: 100,
-                height: 100,
+                width: 200,
+                height: 200,
                 decoration: BoxDecoration(
-                  color: Color(0xFF2E7D3A),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Center(
-                  child: Text(
-                    '30',
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                  image: DecorationImage(
+                    image: AssetImage('assets/logo.png'),
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
-              
-              SizedBox(height: 20),
-              
+
+              SizedBox(height: 10),
+
               Text(
                 'KruNchie',
                 style: TextStyle(
-                  fontSize: 28,
+                  fontSize: 30,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               ),
-              
+
               SizedBox(height: 60),
-              
+
               // Username field
               _buildTextField(_usernameController, 'Username'),
-              
+
               SizedBox(height: 16),
-              
+
               // Password field
-              _buildTextField(_passwordController, 'password', isPassword: true),
-              
+              _buildTextField(
+                _passwordController,
+                'password',
+                isPassword: true,
+              ),
+
               SizedBox(height: 32),
-              
+
               // Login button
               _buildLoginButton(),
-              
+
               SizedBox(height: 20),
-              
+
               Text(
                 "Don't have an account yet?",
                 style: TextStyle(color: Colors.grey[600]),
               ),
-              
+
               TextButton(
                 onPressed: () {},
                 child: Text(
@@ -85,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              
+
               Spacer(),
             ],
           ),
@@ -94,7 +90,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, {bool isPassword = false}) {
+  Widget _buildTextField(
+    TextEditingController controller,
+    String hint, {
+    bool isPassword = false,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey[100],
@@ -106,10 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
         decoration: InputDecoration(
           hintText: hint,
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 16,
-          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         ),
       ),
     );
@@ -123,15 +120,13 @@ class _LoginScreenState extends State<LoginScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => TodoListScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => TodoListScreen()),
           );
         },
         child: Text(
           'LOG IN',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
