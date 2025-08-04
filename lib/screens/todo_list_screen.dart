@@ -278,11 +278,21 @@ class _TodoListScreenState extends State<TodoListScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => TodoListScreen()),
+              );
+            },
             icon: Icon(Icons.list_alt, color: Colors.white, size: 28),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AppScreen()),
+              );
+            },
             icon: Icon(Icons.calendar_today, color: Colors.white, size: 28),
           ),
           IconButton(
