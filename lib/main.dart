@@ -11,8 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'KruNchie Todo App',
-      
-      // เพิ่มการตั้งค่า Locale สำหรับภาษาไทย
+
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -22,13 +21,12 @@ class MyApp extends StatelessWidget {
         Locale('en', ''), // English
         Locale('th', ''), // Thai
       ],
-      locale: Locale('th', ''), // ตั้งค่าเป็นภาษาไทยเป็นหลัก
-      
+      locale: Locale('th', ''),
+
       theme: ThemeData(
         primarySwatch: Colors.green,
-        // เพิ่ม Thai font
-        fontFamily: 'Sarabun', // หรือใช้ default ที่รองรับไทย
-        
+
+        fontFamily: 'Sarabun',
 
         textTheme: TextTheme(
           bodyLarge: TextStyle(fontFamily: 'Sarabun'),
@@ -38,7 +36,7 @@ class MyApp extends StatelessWidget {
           titleSmall: TextStyle(fontFamily: 'Sarabun'),
         ),
       ),
-      
+
       home: LoginScreen(),
       debugShowCheckedModeBanner: false,
     );

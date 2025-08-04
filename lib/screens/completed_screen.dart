@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import '../models/todo_item.dart';
 import 'todo_list_screen.dart';
-import 'app_screen.dart';
+import 'profile_screen.dart';
 
 class CompletedScreen extends StatefulWidget {
   final List<TodoItem> completedItems;
 
-  const CompletedScreen({Key? key, required this.completedItems}) : super(key: key);
+  const CompletedScreen({Key? key, required this.completedItems})
+    : super(key: key);
 
   @override
   _CompletedScreenState createState() => _CompletedScreenState();
@@ -17,12 +18,7 @@ class _CompletedScreenState extends State<CompletedScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _buildHeader(),
-          _buildCompletedList(),
-        ],
-      ),
+      body: Column(children: [_buildHeader(), _buildCompletedList()]),
       bottomNavigationBar: _buildBottomNavigation(),
     );
   }
@@ -126,11 +122,7 @@ class _CompletedScreenState extends State<CompletedScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.task_alt,
-              size: 80,
-              color: Colors.grey[300],
-            ),
+            Icon(Icons.task_alt, size: 80, color: Colors.grey[300]),
             SizedBox(height: 16),
             Text(
               'ยังไม่มีงานที่เสร็จ',
@@ -143,10 +135,7 @@ class _CompletedScreenState extends State<CompletedScreen> {
             SizedBox(height: 8),
             Text(
               'เมื่อคุณทำงานเสร็จ จะแสดงที่นี่',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[400],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[400]),
             ),
           ],
         ),
@@ -228,7 +217,10 @@ class _CompletedScreenState extends State<CompletedScreen> {
                             children: [
                               Icon(Icons.delete, size: 18, color: Colors.red),
                               SizedBox(width: 8),
-                              Text('ลบถาวร', style: TextStyle(color: Colors.red)),
+                              Text(
+                                'ลบถาวร',
+                                style: TextStyle(color: Colors.red),
+                              ),
                             ],
                           ),
                         ),
@@ -250,11 +242,18 @@ class _CompletedScreenState extends State<CompletedScreen> {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.schedule, size: 14, color: Colors.white70),
+                            Icon(
+                              Icons.schedule,
+                              size: 14,
+                              color: Colors.white70,
+                            ),
                             SizedBox(width: 8),
                             Text(
                               'เริ่ม: ${item.formattedStartDate} ${item.formattedStartTime}',
-                              style: TextStyle(color: Colors.white70, fontSize: 11),
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 11,
+                              ),
                             ),
                           ],
                         ),
@@ -262,11 +261,18 @@ class _CompletedScreenState extends State<CompletedScreen> {
                           SizedBox(height: 4),
                           Row(
                             children: [
-                              Icon(Icons.event, size: 14, color: Colors.white70),
+                              Icon(
+                                Icons.event,
+                                size: 14,
+                                color: Colors.white70,
+                              ),
                               SizedBox(width: 8),
                               Text(
                                 'สิ้นสุด: ${item.formattedEndDate} ${item.formattedEndTime}',
-                                style: TextStyle(color: Colors.white70, fontSize: 11),
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 11,
+                                ),
                               ),
                             ],
                           ),
@@ -350,9 +356,9 @@ class _CompletedScreenState extends State<CompletedScreen> {
       item.completedDate = null;
       widget.completedItems.removeAt(index);
     });
-    
+
     Navigator.pop(context, item); // ส่งกลับไปยังหน้าหลัก
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('กลับรายการไปยังรายการหลักแล้ว'),
@@ -400,7 +406,10 @@ class _CompletedScreenState extends State<CompletedScreen> {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => AppScreen()),
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ProfileScreen(username: '', todoItems: []),
+                ),
               );
             },
             icon: Icon(Icons.person, color: Colors.white70, size: 28),

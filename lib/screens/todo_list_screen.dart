@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/todo_item.dart';
-import 'app_screen.dart';
+import 'profile_screen.dart';
 import 'completed_screen.dart';
 import 'package:intl/intl.dart';
 
@@ -31,7 +31,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
   Widget _buildHeader() {
     final completedCount = todoItems.where((item) => item.isCompleted).length;
     final totalCount = todoItems.length;
-    
+
     return Container(
       padding: EdgeInsets.only(top: 50, left: 16, right: 16, bottom: 20),
       child: Row(
@@ -86,7 +86,9 @@ class _TodoListScreenState extends State<TodoListScreen> {
   }
 
   Widget _buildTodoList() {
-    final uncompletedItems = todoItems.where((item) => !item.isCompleted).toList();
+    final uncompletedItems = todoItems
+        .where((item) => !item.isCompleted)
+        .toList();
     final completedCount = todoItems.where((item) => item.isCompleted).length;
 
     return Expanded(
@@ -111,11 +113,16 @@ class _TodoListScreenState extends State<TodoListScreen> {
                   GestureDetector(
                     onTap: () => _goToCompletedScreen(),
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Color(0xFF2E7D3A).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Color(0xFF2E7D3A).withOpacity(0.3)),
+                        border: Border.all(
+                          color: Color(0xFF2E7D3A).withOpacity(0.3),
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -172,11 +179,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.assignment_turned_in,
-              size: 80,
-              color: Colors.grey[300],
-            ),
+            Icon(Icons.assignment_turned_in, size: 80, color: Colors.grey[300]),
             SizedBox(height: 16),
             Text(
               'ไม่มีรายการที่ต้องทำ',
@@ -189,10 +192,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
             SizedBox(height: 8),
             Text(
               'กดปุ่ม + เพื่อเพิ่มรายการใหม่',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[400],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[400]),
             ),
           ],
         ),
@@ -300,7 +300,11 @@ class _TodoListScreenState extends State<TodoListScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
+                      Icon(
+                        Icons.calendar_today,
+                        size: 16,
+                        color: Colors.grey[600],
+                      ),
                       SizedBox(width: 8),
                       Text(
                         'เริ่ม: ${item.formattedStartDate} ${item.formattedStartTime}',
@@ -316,7 +320,10 @@ class _TodoListScreenState extends State<TodoListScreen> {
                         SizedBox(width: 8),
                         Text(
                           'สิ้นสุด: ${item.formattedEndDate} ${item.formattedEndTime}',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
                         ),
                       ],
                     ),
@@ -348,14 +355,14 @@ class _TodoListScreenState extends State<TodoListScreen> {
 
   void _goToCompletedScreen() async {
     final completedItems = todoItems.where((item) => item.isCompleted).toList();
-    
+
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CompletedScreen(completedItems: completedItems),
       ),
     );
-    
+
     // If an item was restored, add it back to the main list
     if (result != null && result is TodoItem) {
       setState(() {
@@ -405,7 +412,10 @@ class _TodoListScreenState extends State<TodoListScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AppScreen()),
+                MaterialPageRoute(builder: (context) => ProfileScreen(
+                  username: 'User123',
+                  todoItems: todoItems,
+                )),
               );
             },
             icon: Icon(Icons.person, color: Colors.white70, size: 28),
