@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:makeyourlist/models/todo_item.dart';
+import 'todo_list_screen.dart';
 
 class AppScreen extends StatelessWidget {
   @override
@@ -51,89 +53,62 @@ class AppScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContent() {
-    return Expanded(
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildSearchBar(),
-            SizedBox(height: 20),
-            _buildMenuItem(Icons.work, 'งาน & โครงการ', '10'),
-            SizedBox(height: 12),
-            _buildMenuItem(Icons.group, 'ทีมงาน', '5'),
-            SizedBox(height: 12),
-            _buildMenuItem(Icons.folder, 'โครงการ', '3'),
-            SizedBox(height: 12),
-            _buildMenuItem(Icons.link, 'แชนจาบราซิล', '2'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchBar() {
+Widget _buildCompletedItem(TodoItem item) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'Job name...',
-          border: InputBorder.none,
-          prefixIcon: Icon(Icons.calendar_today, color: Colors.grey),
-          suffixText: 'ออกแบบ',
-          suffixStyle: TextStyle(color: Colors.grey),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMenuItem(IconData icon, String title, String count) {
-    return Container(
+      margin: EdgeInsets.only(bottom: 8),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color(0xFF2E7D3A),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: Offset(0, 1),
-          ),
-        ],
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: Colors.grey[600]),
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
+          Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  item.title,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-          Text(
-            count,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
+
+          // Completed date info
+          if (item.startDate != null) ...[
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.schedule, size: 14, color: Colors.white70),
+                SizedBox(width: 8),
+                Text(
+                  'ระยะเวลา: ${item.formattedStartDate} - ${item.formattedEndDate}',
+                  style: TextStyle(color: Colors.white70, fontSize: 11),
+                ),
+              ],
             ),
-          ),
+          ],
+
+          if (item.completedDate != null) ...[
+            SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(Icons.done, size: 14, color: Colors.white70),
+                SizedBox(width: 8),
+                Text(
+                  'เสร็จเมื่อ: ${item.completedDate!.day}/${item.completedDate!.month}/${item.completedDate!.year}',
+                  style: TextStyle(color: Colors.white70, fontSize: 11),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -168,4 +143,16 @@ class AppScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildContent() {
+  // Replace with your actual content widget
+  return Expanded(
+    child: Center(
+      child: Text(
+        'Content goes here',
+        style: TextStyle(fontSize: 18),
+      ),
+    ),
+  );
 }

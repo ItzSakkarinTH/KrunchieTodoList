@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/todo_item.dart';
 import 'app_screen.dart';
+import 'completed_screen.dart';
 import 'package:intl/intl.dart';
 
 class TodoListScreen extends StatefulWidget {
@@ -28,6 +29,9 @@ class _TodoListScreenState extends State<TodoListScreen> {
   }
 
   Widget _buildHeader() {
+    final completedCount = todoItems.where((item) => item.isCompleted).length;
+    final totalCount = todoItems.length;
+    
     return Container(
       padding: EdgeInsets.only(top: 50, left: 16, right: 16, bottom: 20),
       child: Row(
@@ -59,57 +63,139 @@ class _TodoListScreenState extends State<TodoListScreen> {
               ),
             ),
           ),
-          SizedBox(width: 48),
+          // Progress indicator
+          if (totalCount > 0)
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Color(0xFF2E7D3A),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Text(
+                '$completedCount/$totalCount',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
         ],
       ),
     );
   }
 
   Widget _buildTodoList() {
+    final uncompletedItems = todoItems.where((item) => !item.isCompleted).toList();
+    final completedCount = todoItems.where((item) => item.isCompleted).length;
+
     return Expanded(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle('รายการ'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'รายการ',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                // Link to completed screen
+                if (completedCount > 0)
+                  GestureDetector(
+                    onTap: () => _goToCompletedScreen(),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF2E7D3A).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(color: Color(0xFF2E7D3A).withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.task_alt,
+                            size: 16,
+                            color: Color(0xFF2E7D3A),
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            'เสร็จแล้ว ($completedCount)',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF2E7D3A),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(width: 4),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            size: 12,
+                            color: Color(0xFF2E7D3A),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             SizedBox(height: 16),
 
             // Todo items
-            Expanded(
-              child: ListView.builder(
-                itemCount: todoItems.where((item) => !item.isCompleted).length,
-                itemBuilder: (context, index) {
-                  final item = todoItems
-                      .where((item) => !item.isCompleted)
-                      .toList()[index];
-                  return _buildTodoItem(item);
-                },
-              ),
-            ),
-
-            SizedBox(height: 20),
-            _buildSectionTitle('เสร็จแล้ว'),
-            SizedBox(height: 16),
-
-            // Completed items
-            ...todoItems
-                .where((item) => item.isCompleted)
-                .map((item) => _buildCompletedItem(item))
-                .toList(),
+            uncompletedItems.isEmpty
+                ? _buildEmptyState()
+                : Expanded(
+                    child: ListView.builder(
+                      itemCount: uncompletedItems.length,
+                      itemBuilder: (context, index) {
+                        final item = uncompletedItems[index];
+                        return _buildTodoItem(item);
+                      },
+                    ),
+                  ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: Colors.grey[700],
+  Widget _buildEmptyState() {
+    return Expanded(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.assignment_turned_in,
+              size: 80,
+              color: Colors.grey[300],
+            ),
+            SizedBox(height: 16),
+            Text(
+              'ไม่มีรายการที่ต้องทำ',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey[500],
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'กดปุ่ม + เพื่อเพิ่มรายการใหม่',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[400],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -142,10 +228,15 @@ class _TodoListScreenState extends State<TodoListScreen> {
                     item.isCompleted = value ?? false;
                     if (item.isCompleted) {
                       item.completedDate = DateTime.now();
+                      // Show completion animation/feedback
+                      _showCompletionFeedback(item.title);
                     }
                   });
                 },
                 activeColor: Color(0xFF2E7D3A),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
               ),
               Expanded(
                 child: Text(
@@ -160,100 +251,117 @@ class _TodoListScreenState extends State<TodoListScreen> {
                   ),
                 ),
               ),
+              // Menu for each item
+              PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert, color: Colors.grey[600]),
+                onSelected: (value) {
+                  if (value == 'edit') {
+                    _showEditTodoDialog(item);
+                  } else if (value == 'delete') {
+                    _showDeleteConfirmation(item);
+                  }
+                },
+                itemBuilder: (BuildContext context) => [
+                  PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit, size: 18),
+                        SizedBox(width: 8),
+                        Text('แก้ไข'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, size: 18, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('ลบ', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
 
           // Date and Time info
           if (item.startDate != null || item.endDate != null) ...[
             SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
-                SizedBox(width: 8),
-                Text(
-                  'เริ่ม: ${item.formattedStartDate} ${item.formattedStartTime}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
-              ],
-            ),
-            if (item.endDate != null) ...[
-              SizedBox(height: 4),
-              Row(
+            Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
                 children: [
-                  Icon(Icons.event, size: 16, color: Colors.grey[600]),
-                  SizedBox(width: 8),
-                  Text(
-                    'สิ้นสุด: ${item.formattedEndDate} ${item.formattedEndTime}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
+                      SizedBox(width: 8),
+                      Text(
+                        'เริ่ม: ${item.formattedStartDate} ${item.formattedStartTime}',
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      ),
+                    ],
                   ),
+                  if (item.endDate != null) ...[
+                    SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.event, size: 16, color: Colors.grey[600]),
+                        SizedBox(width: 8),
+                        Text(
+                          'สิ้นสุด: ${item.formattedEndDate} ${item.formattedEndTime}',
+                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
-            ],
+            ),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildCompletedItem(TodoItem item) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 8),
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Color(0xFF2E7D3A),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  item.title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          // Completed date info
-          if (item.startDate != null) ...[
-            SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.schedule, size: 14, color: Colors.white70),
-                SizedBox(width: 8),
-                Text(
-                  'ระยะเวลา: ${item.formattedStartDate} - ${item.formattedEndDate}',
-                  style: TextStyle(color: Colors.white70, fontSize: 11),
-                ),
-              ],
-            ),
+  void _showCompletionFeedback(String title) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.white),
+            SizedBox(width: 8),
+            Expanded(child: Text('เสร็จสิ้น: $title')),
           ],
-
-          if (item.completedDate != null) ...[
-            SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(Icons.done, size: 14, color: Colors.white70),
-                SizedBox(width: 8),
-                Text(
-                  'เสร็จเมื่อ: ${item.completedDate!.day}/${item.completedDate!.month}/${item.completedDate!.year}',
-                  style: TextStyle(color: Colors.white70, fontSize: 11),
-                ),
-              ],
-            ),
-          ],
-        ],
+        ),
+        backgroundColor: Color(0xFF2E7D3A),
+        duration: Duration(seconds: 2),
       ),
     );
+  }
+
+  void _goToCompletedScreen() async {
+    final completedItems = todoItems.where((item) => item.isCompleted).toList();
+    
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CompletedScreen(completedItems: completedItems),
+      ),
+    );
+    
+    // If an item was restored, add it back to the main list
+    if (result != null && result is TodoItem) {
+      setState(() {
+        todoItems.add(result);
+      });
+    }
   }
 
   Widget _buildAddButton() {
@@ -277,14 +385,21 @@ class _TodoListScreenState extends State<TodoListScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+          // Current screen - highlight it
           IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => TodoListScreen()),
-              );
-            },
-            icon: Icon(Icons.list_alt, color: Colors.white, size: 28),
+            onPressed: () {},
+            icon: Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.list_alt, color: Colors.white, size: 28),
+            ),
+          ),
+          IconButton(
+            onPressed: () => _goToCompletedScreen(),
+            icon: Icon(Icons.task_alt, color: Colors.white70, size: 28),
           ),
           IconButton(
             onPressed: () {
@@ -293,14 +408,133 @@ class _TodoListScreenState extends State<TodoListScreen> {
                 MaterialPageRoute(builder: (context) => AppScreen()),
               );
             },
-            icon: Icon(Icons.calendar_today, color: Colors.white, size: 28),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.person, color: Colors.white, size: 28),
+            icon: Icon(Icons.person, color: Colors.white70, size: 28),
           ),
         ],
       ),
+    );
+  }
+
+  void _showDeleteConfirmation(TodoItem item) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('ลบรายการ'),
+          content: Text('คุณต้องการลบ "${item.title}" หรือไม่?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('ยกเลิก'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  todoItems.remove(item);
+                });
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('ลบรายการเรียบร้อยแล้ว'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              },
+              child: Text('ลบ', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditTodoDialog(TodoItem item) {
+    // Set current values
+    _todoController.text = item.title;
+    _selectedStartDate = item.startDate;
+    _selectedEndDate = item.endDate;
+    _selectedStartTime = item.startTime;
+    _selectedEndTime = item.endTime;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text('แก้ไขรายการ'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Title input
+                    TextField(
+                      controller: _todoController,
+                      decoration: InputDecoration(
+                        hintText: 'ใส่รายการที่ต้องทำ...',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+
+                    SizedBox(height: 16),
+
+                    // Start Date
+                    _buildDateTimePicker(
+                      label: 'วันที่เริ่มต้น',
+                      date: _selectedStartDate,
+                      time: _selectedStartTime,
+                      onDateTap: () => _selectStartDate(setDialogState),
+                      onTimeTap: () => _selectStartTime(setDialogState),
+                    ),
+
+                    SizedBox(height: 12),
+
+                    // End Date
+                    _buildDateTimePicker(
+                      label: 'วันที่สิ้นสุด',
+                      date: _selectedEndDate,
+                      time: _selectedEndTime,
+                      onDateTap: () => _selectEndDate(setDialogState),
+                      onTimeTap: () => _selectEndTime(setDialogState),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _todoController.clear();
+                  },
+                  child: Text('ยกเลิก'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (_todoController.text.isNotEmpty) {
+                      setState(() {
+                        item.title = _todoController.text;
+                        item.startDate = _selectedStartDate;
+                        item.endDate = _selectedEndDate;
+                        item.startTime = _selectedStartTime;
+                        item.endTime = _selectedEndTime;
+                      });
+                      _todoController.clear();
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('แก้ไขรายการเรียบร้อยแล้ว'),
+                          backgroundColor: Color(0xFF2E7D3A),
+                        ),
+                      );
+                    }
+                  },
+                  child: Text('บันทึก'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
