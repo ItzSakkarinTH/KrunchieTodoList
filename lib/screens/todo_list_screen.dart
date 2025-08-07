@@ -288,6 +288,8 @@ class _TodoListScreenState extends State<TodoListScreen> {
                         : TextDecoration.none,
                     color: item.isCompleted ? Colors.grey : Colors.black,
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
               ),
               // Menu for each item
@@ -345,9 +347,12 @@ class _TodoListScreenState extends State<TodoListScreen> {
                         color: Colors.grey[600],
                       ),
                       SizedBox(width: 8),
-                      Text(
-                        'เริ่ม: ${item.formattedStartDate} ${item.formattedStartTime}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      Flexible(
+                        child: Text(
+                          'เริ่ม: ${item.formattedStartDate} ${item.formattedStartTime}',
+                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
@@ -357,11 +362,14 @@ class _TodoListScreenState extends State<TodoListScreen> {
                       children: [
                         Icon(Icons.event, size: 16, color: Colors.grey[600]),
                         SizedBox(width: 8),
-                        Text(
-                          'สิ้นสุด: ${item.formattedEndDate} ${item.formattedEndTime}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
+                        Flexible(
+                          child: Text(
+                            'สิ้นสุด: ${item.formattedEndDate} ${item.formattedEndTime}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -383,11 +391,23 @@ class _TodoListScreenState extends State<TodoListScreen> {
           children: [
             Icon(Icons.check_circle, color: Colors.white),
             SizedBox(width: 8),
-            Expanded(child: Text('เสร็จสิ้น: $title')),
+            Flexible(
+              child: Text(
+                'เสร็จสิ้น: $title',
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
           ],
         ),
         backgroundColor: Color(0xFF2E7D3A),
         duration: Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 150,
+          left: 16,
+          right: 16,
+        ),
       ),
     );
   }
@@ -488,6 +508,12 @@ class _TodoListScreenState extends State<TodoListScreen> {
                   SnackBar(
                     content: Text('ลบรายการเรียบร้อยแล้ว'),
                     backgroundColor: Colors.red,
+                    behavior: SnackBarBehavior.floating,
+                    margin: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).size.height - 150,
+                      left: 16,
+                      right: 16,
+                    ),
                   ),
                 );
               },
@@ -576,6 +602,12 @@ class _TodoListScreenState extends State<TodoListScreen> {
                         SnackBar(
                           content: Text('แก้ไขรายการเรียบร้อยแล้ว'),
                           backgroundColor: Color(0xFF2E7D3A),
+                          behavior: SnackBarBehavior.floating,
+                          margin: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).size.height - 150,
+                            left: 16,
+                            right: 16,
+                          ),
                         ),
                       );
                     }
