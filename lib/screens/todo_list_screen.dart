@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import '../models/todo_item.dart';
 import 'profile_screen.dart';
 import 'completed_screen.dart';
@@ -17,6 +19,42 @@ class _TodoListScreenState extends State<TodoListScreen> {
   DateTime? _selectedEndDate;
   TimeOfDay? _selectedStartTime;
   TimeOfDay? _selectedEndTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTodoItems();
+  }
+
+  // โหลดข้อมูล todo จาก SharedPreferences
+  Future<void> _loadTodoItems() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? todoString = prefs.getString('todo_items');
+      
+      if (todoString != null) {
+        final List<dynamic> jsonList = jsonDecode(todoString);
+        setState(() {
+          todoItems = jsonList.map((json) => TodoItem.fromJson(json)).toList();
+        });
+      }
+    } catch (e) {
+      print('Error loading todo items: $e');
+    }
+  }
+
+  // บันทึกข้อมูล todo ลง SharedPreferences
+  Future<void> _saveTodoItems() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String jsonString = jsonEncode(
+        todoItems.map((item) => item.toJson()).toList()
+      );
+      await prefs.setString('todo_items', jsonString);
+    } catch (e) {
+      print('Error saving todo items: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +261,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
             children: [
               Checkbox(
                 value: item.isCompleted,
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     item.isCompleted = value ?? false;
                     if (item.isCompleted) {
@@ -232,6 +270,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                       _showCompletionFeedback(item.title);
                     }
                   });
+                  await _saveTodoItems(); // บันทึกทันทีเมื่อมีการเปลี่ยนแปลง
                 },
                 activeColor: Color(0xFF2E7D3A),
                 shape: RoundedRectangleBorder(
@@ -368,6 +407,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
       setState(() {
         todoItems.add(result);
       });
+      await _saveTodoItems(); // บันทึกการเปลี่ยนแปลง
     }
   }
 
@@ -438,10 +478,11 @@ class _TodoListScreenState extends State<TodoListScreen> {
               child: Text('ยกเลิก'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 setState(() {
                   todoItems.remove(item);
                 });
+                await _saveTodoItems(); // บันทึกการเปลี่ยนแปลง
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -519,7 +560,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                   child: Text('ยกเลิก'),
                 ),
                 TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_todoController.text.isNotEmpty) {
                       setState(() {
                         item.title = _todoController.text;
@@ -528,6 +569,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                         item.startTime = _selectedStartTime;
                         item.endTime = _selectedEndTime;
                       });
+                      await _saveTodoItems(); // บันทึกการเปลี่ยนแปลง
                       _todoController.clear();
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -609,7 +651,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                   child: Text('ยกเลิก'),
                 ),
                 TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_todoController.text.isNotEmpty) {
                       setState(() {
                         todoItems.add(
@@ -623,6 +665,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                           ),
                         );
                       });
+                      await _saveTodoItems(); // บันทึกการเปลี่ยนแปลง
                       _todoController.clear();
                       Navigator.pop(context);
                     }
